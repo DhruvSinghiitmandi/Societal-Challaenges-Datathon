@@ -173,7 +173,7 @@ def merge_data(data_dir):
     df_train, df_test = train_test_split(df, test_size=0.2, random_state=289)
 
 
-    import matplotlib.pyplot as plt
+    
     counts = df['status'].value_counts()
     diabetic = counts.get(1, 0)
     non_diabetic = counts.get(0, 0)
@@ -195,5 +195,5 @@ def merge_data(data_dir):
 
 if __name__ == '__main__':
     data_dir = 'data'
-    # download_data(data_dir)
+    download_data(data_dir)
     merge_data(data_dir)

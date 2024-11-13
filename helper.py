@@ -1,15 +1,16 @@
 
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 import seaborn as sns
-
+import pandas as pd
+path = './'
+variables_df = pd.read_csv(path + 'variables.csv', encoding='ISO-8859-1')
+# print(variables_df.head())
+variable_dict = dict(zip(variables_df['Variable Name'], variables_df['Renamed_variables']))
 # Define variable_dict with appropriate mappings
-variable_dict = {
-    'var_name_example': 'Variable Name Example',
-    'DIQ010': 'Diabetes Status'
-}
 
 
 def hist(merged_data, var_name):
+    
     plt.figure(figsize=(10, 6))
     sns.histplot(data=merged_data, x=var_name, hue='DIQ010', multiple='stack', palette={1: 'blue', 2: 'orange'})
     plt.xlabel(var_name)
@@ -53,6 +54,7 @@ def hist(merged_data, var_name):
     
     plt.show()
 def pie_chart(merged_data,var_name):
+    import matplotlib.pyplot as plt
     plt.figure(figsize=(8, 8))
     plt.legend()
     if var_name in merged_data.columns:
@@ -76,3 +78,5 @@ def save_dict( df ,filename):
     df.rename(columns=variable_dict, inplace=True)
     df.to_csv(filename + '.csv', index=False)
     print(df.head())
+
+

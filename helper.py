@@ -24,10 +24,8 @@ def hist(merged_data, var_name):
             plt.xlim(unique_values[0], unique_values[-3])
         else:
             plt.xlim(unique_values[0], unique_values[-1])
-        print(unique_values)
         if len(unique_values) >= 3:
             third_largest_unique_value = unique_values[-3]
-            print(third_largest_unique_value)
         else:
             print("Not enough unique values to find the third largest.")
         
@@ -77,6 +75,5 @@ def heatmap(merged_data,var1, var2):
 def save_dict( df ,filename):
     df.rename(columns=variable_dict, inplace=True)
     df.to_csv(filename + '.csv', index=False)
-    print(df.head())
-
+    print(f"File {filename}.csv saved successfully")    
 

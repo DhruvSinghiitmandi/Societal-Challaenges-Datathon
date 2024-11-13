@@ -1,4 +1,4 @@
-*.xpt
+*.XPT
 *.csv
 .venv/
 __MACOSX/

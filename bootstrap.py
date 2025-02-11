@@ -195,5 +195,5 @@ def merge_data(data_dir):
 
 if __name__ == '__main__':
     data_dir = 'data'
-    download_data(data_dir)
+    # download_data(data_dir)
     merge_data(data_dir)

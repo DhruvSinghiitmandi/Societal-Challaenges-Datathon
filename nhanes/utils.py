@@ -6,6 +6,19 @@ from sklearn.model_selection import GridSearchCV
 from sklearn import metrics
 
 
+
+import pandas as pd
+from sklearn.impute import KNNImputer
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import LabelEncoder
+
+
+
+
+
+
 def one_hot_encode(feature, prefix):
     return pd.get_dummies(data=feature,
                           prefix=prefix,
@@ -187,4 +200,118 @@ def plot_bootstrap_roc(m, ci, filename='./img/Bootstrap_ROC_confint.png'):
     plt.title('Bootstrap ROC Curve', fontsize=14)
     plt.tick_params(axis='both', which='major', labelsize=14)
     plt.savefig(filename)
+    plt.show()
+
+
+
+
+def knn_impute_data(df, columns, n_neighbors=7):
+    """Impute missing values using KNNImputer"""
+    imputer = KNNImputer(n_neighbors=n_neighbors)
+    df[columns] = imputer.fit_transform(df[columns])
+    return df
+
+def handle_categorical_imputation(train_df, test_df, categorical_cols):
+    """Handle categorical encoding, iterative imputation, and decoding"""
+    # Combine datasets
+    combined = pd.concat([train_df, test_df], axis=0)
+    
+    # Encode categorical columns
+    encoders = {}
+    for col in categorical_cols:
+        le = LabelEncoder()
+        combined[col] = le.fit_transform(combined[col].astype(str))
+        encoders[col] = le
+    
+    # Impute missing values
+    imputer = IterativeImputer(max_iter=10, random_state=0)
+    imputed_data = imputer.fit_transform(combined)
+    imputed_df = pd.DataFrame(imputed_data, columns=combined.columns)
+    
+    # Decode categorical columns
+    for col in categorical_cols:
+        imputed_df[col] = encoders[col].inverse_transform(imputed_df[col].round().astype(int))
+    
+    # Split back into train/test
+    train_imputed = imputed_df.iloc[:len(train_df)].reset_index(drop=True)
+    test_imputed = imputed_df.iloc[len(train_df):].reset_index(drop=True)
+    return train_imputed, test_imputed
+
+def regression_imputation(target_col, train_df, test_df, features):
+    """Perform regression-based imputation for a target column"""
+    # Train model
+    valid_data = train_df.dropna(subset=[target_col])
+    if valid_data.empty:
+        return train_df, test_df
+    
+    model = LinearRegression()
+    model.fit(valid_data[features], valid_data[target_col])
+    
+    # Impute missing values
+    for df in [train_df, test_df]:
+        missing = df[df[target_col].isnull()]
+        if not missing.empty:
+            predictions = model.predict(missing[features])
+            df.loc[missing.index, target_col] = predictions
+    return train_df, test_df
+
+def post_processing(df, sleep_imp_value):
+    """Handle final missing value replacements"""
+    df['SleepDuration'].fillna(sleep_imp_value, inplace=True)
+    df['Smoked at least 100 cigarettes in life'].fillna(2, inplace=True)
+    return df
+
+
+def plot_roc(selected_features_test,clf,y_test_resampled,):
+
+    y_pred = clf.predict(selected_features_test)
+
+
+    # Evaluate the performance
+    accuracy = metrics.accuracy_score(y_test_resampled, y_pred)
+    classification_report = metrics.classification_report(y_test_resampled, y_pred)
+    confusion_matrix = metrics.confusion_matrix(y_test_resampled, y_pred)
+
+    print("Accuracy:", accuracy)
+    print("Classification Report:\n", classification_report)
+
+    print("Confusion Matrix:\n", confusion_matrix)
+    # Import necessary modules
+    import matplotlib.pyplot as plt
+
+    # Compute additional performance metrics
+    f1 = metrics.f1_score(y_test_resampled, y_pred)
+    precision = metrics.precision_score(y_test_resampled, y_pred)
+
+    # Create a figure with three subplots: one for the confusion matrix,
+    # one for the F1-score and one for the Precision score.
+    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(18, 5))
+
+    # -------------------
+    # Plot the Confusion Matrix
+    # -------------------
+    cm = confusion_matrix  # already computed
+    im = axes[0].imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+    axes[0].set_title("Confusion Matrix")
+    plt.colorbar(im, ax=axes[0])
+    # Define the class names (assuming binary classification: 0 and 1)
+    class_names = ['0', '1']
+    tick_marks = np.arange(len(class_names))
+    axes[0].set_xticks(tick_marks)
+    axes[0].set_xticklabels(class_names)
+    axes[0].set_yticks(tick_marks)
+    axes[0].set_yticklabels(class_names)
+    axes[0].set_xlabel("Predicted Label")
+    axes[0].set_ylabel("True Label")
+
+    # Annotate each cell with its value
+    thresh = cm.max() / 2.
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            axes[0].text(j, i, format(cm[i, j], 'd'),
+                        ha="center", va="center",
+                        color="white" if cm[i, j] > thresh else "black")
+
+    # --------
+    plt.tight_layout()
     plt.show()

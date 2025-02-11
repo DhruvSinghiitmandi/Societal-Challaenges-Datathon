@@ -10,7 +10,7 @@ Welcome to the **Societal Challenges Datathon** project. This repository contain
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
-
+- [License](#license)
 
 
 ## Data and Results Locations
@@ -109,3 +109,6 @@ You can download raw datasets directly from the [NHANES website](https://www.cdc
 ## Contributing
 Contributions are welcome! Please fork the repository and create a pull request with your changes. For major changes, open an issue first to discuss what you would like to change.
 
+## License
+
+This project is under the MIT License.

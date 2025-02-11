@@ -114,15 +114,6 @@ def merge_data(data_dir):
     df_pop = pd.concat([df_00])
 
 
-    '''Diagnosed Diabetes (total should be 1,266)
-
-    The next questions are about specific medical conditions.
-    {Other than during pregnancy, {have you/has SP}/{Have you/Has SP}}
-    ever been told by a doctor or health professional that
-    {you have/{he/she/SP} has} diabetes or sugar diabetes?
-    '''
-   
-
 
     # df = pd.concat([diag_total, undiag_total, prediab_total, nodiab_total], ignore_index=True)
     df = df_00.copy()

@@ -262,56 +262,45 @@ def post_processing(df, sleep_imp_value):
     return df
 
 
-def plot_roc(selected_features_test,clf,y_test_resampled,):
-
+def plot_roc(selected_features_test, clf, y_test_resampled):
     y_pred = clf.predict(selected_features_test)
-
 
     # Evaluate the performance
     accuracy = metrics.accuracy_score(y_test_resampled, y_pred)
     classification_report = metrics.classification_report(y_test_resampled, y_pred)
-    confusion_matrix = metrics.confusion_matrix(y_test_resampled, y_pred)
+    cm = metrics.confusion_matrix(y_test_resampled, y_pred)
 
     print("Accuracy:", accuracy)
     print("Classification Report:\n", classification_report)
-
-    print("Confusion Matrix:\n", confusion_matrix)
-    # Import necessary modules
-    import matplotlib.pyplot as plt
+    print("Confusion Matrix:\n", cm)
 
     # Compute additional performance metrics
     f1 = metrics.f1_score(y_test_resampled, y_pred)
     precision = metrics.precision_score(y_test_resampled, y_pred)
 
-    # Create a figure with three subplots: one for the confusion matrix,
-    # one for the F1-score and one for the Precision score.
-    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(18, 5))
-
-    # -------------------
-    # Plot the Confusion Matrix
-    # -------------------
-    cm = confusion_matrix  # already computed
-    im = axes[0].imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
-    axes[0].set_title("Confusion Matrix")
-    plt.colorbar(im, ax=axes[0])
-    # Define the class names (assuming binary classification: 0 and 1)
+    # Plot in a single figure
+    import matplotlib.pyplot as plt
+    plt.figure(figsize=(8, 6))
+    im = plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+    plt.title("Confusion Matrix")
+    plt.colorbar(im)
+    
     class_names = ['0', '1']
     tick_marks = np.arange(len(class_names))
-    axes[0].set_xticks(tick_marks)
-    axes[0].set_xticklabels(class_names)
-    axes[0].set_yticks(tick_marks)
-    axes[0].set_yticklabels(class_names)
-    axes[0].set_xlabel("Predicted Label")
-    axes[0].set_ylabel("True Label")
-
-    # Annotate each cell with its value
+    plt.xticks(tick_marks, class_names)
+    plt.yticks(tick_marks, class_names)
+    plt.xlabel("Predicted Label")
+    plt.ylabel("True Label")
+    
+    # Annotate confusion matrix cells
     thresh = cm.max() / 2.
     for i in range(cm.shape[0]):
         for j in range(cm.shape[1]):
-            axes[0].text(j, i, format(cm[i, j], 'd'),
-                        ha="center", va="center",
-                        color="white" if cm[i, j] > thresh else "black")
-
-    # --------
+            plt.text(j, i, format(cm[i, j], 'd'),
+                     ha="center", va="center",
+                     color="white" if cm[i, j] > thresh else "black")
+    
+    # Add F1 score and precision as text annotations below the plot
+    plt.figtext(0.5, -0.05, f'F1 Score: {f1:.3f}    Precision: {precision:.3f}', ha='center', fontsize=12)
     plt.tight_layout()
     plt.show()

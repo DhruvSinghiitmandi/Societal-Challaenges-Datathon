@@ -107,10 +107,7 @@ def merge_data(data_dir):
     non_diabetic = counts.get(0, 0)
     diabetic = counts.get(1, 0)
 
-    plt.figure(figsize=(6, 6))
-    plt.pie([non_diabetic, diabetic], labels=['Non Diabetic', 'Diabetic'], autopct='%1.1f%%', startangle=90)
-    plt.title('Diabetes Status Distribution')
-    plt.show()
+ 
     
     df_00.loc[~df_00['LBXGLU'].isna(), 'DIQ010'] = 2 - (df_00['LBXGLU'] >= 126).astype(int)
 
@@ -165,6 +162,8 @@ def merge_data(data_dir):
     df = df.rename(columns=rename_dict)
     df['status'] = df['status'].apply(lambda x: 1.0 if x == 3.0 else x)
     df['Education'] = df['Education'].replace(9, np.nan)
+    df['OCD150'] = df['OCD150'].replace(9, np.nan)
+    df['Smoked at least 100 cigarettes in life'] = df['Smoked at least 100 cigarettes in life'].replace(9, np.nan)
     df = df[~df['status'].isin([7.0, 9.0])]
 
     df['status'] = df['status'].apply(lambda x: 1.0 if x == 1.0 else 0)
@@ -178,11 +177,6 @@ def merge_data(data_dir):
     diabetic = counts.get(1, 0)
     non_diabetic = counts.get(0, 0)
 
-    plt.figure(figsize=(6, 6))
-    # Reverse the current order: now Non Diabetic slice comes first followed by Diabetic
-    plt.pie([non_diabetic, diabetic], labels=['Non Diabetic', 'Diabetic'], autopct='%1.1f%%', startangle=90)
-    plt.title('Diabetes Status Distribution')
-    plt.show()
 
     '''Save data'''
     fname_train = os.path.join(data_dir, 'diabetes_data_train.csv')
